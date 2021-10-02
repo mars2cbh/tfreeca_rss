@@ -17,6 +17,8 @@ headers = {
     'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7'
 }
 
+html_cleaner = re.compile('<.*?>')
+
 
 @app.route('/')
 def index():
@@ -51,6 +53,11 @@ def download():
             if res.status_code == 200:
                 header_referer['Referer'] = download_url
                 return process_file(res.text, header_referer, item_id)
+
+
+def clean_html(raw_html):
+    clean_text = re.sub(html_cleaner, '', raw_html)
+    return clean_text
 
 
 def process_file(html, new_headers, item_id):
@@ -107,11 +114,11 @@ def rss():
     fg.lastBuildDate(date)
 
     if res.status_code == 200:
-        regex = r"href=\"board\.php\?mode=view&b_id=" + board_id + "&id=(.*?)&sc=.*?&page=1\" class=\"stitle[0-9]\">(.*?)<span .*?</a>"
+        regex = r"href=\"board\.php\?mode=view&b_id=" + board_id + "&id=(.*?)&sc=.*?&page=1\" class=\"stitle[0-9]\">(.*?) </a>"
         matches = re.finditer(regex, res.text, re.DOTALL)
         for matchNum, match in enumerate(matches, start=1):
             item_id = match.group(1)
-            item_title = match.group(2).strip()
+            item_title = clean_html(match.group(2).strip())
 
             link = 'https://www.tfreeca22.com/board.php?mode=view&b_id=' + board_id + '&id=' + item_id + '&page=1'
             download_link = request.host_url + 'download?b_id=' + board_id + '&id=' + item_id
