@@ -1,3 +1,5 @@
+import urllib.request
+
 from flask import Flask, request, Response, send_file
 from feedgen.feed import FeedGenerator
 import requests
@@ -7,10 +9,12 @@ import datetime
 app = Flask(__name__)
 
 headers = {
-    'Accept-Language': 'ko-KR,ko;q=0.8,en-US;q=0.6,en;q=0.4',
     'Upgrade-Insecure-Requests': '1',
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+    'Connection': 'keep-alive',
+    'Cache-Control': 'max-age=0',
+    'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7'
 }
 
 
@@ -87,24 +91,23 @@ def rss():
     if board_id is None or sc is None:
         return "Parameter Error"
 
-    list_url = "https://www.tfreeca22.com/board.php?mode=list&b_id={}&sc={}"
+    params = {"mode": "list", "b_id": board_id, "sc": sc}
+    url = "https://www.tfreeca22.com/board.php"
 
-    url = list_url.format(board_id, sc)
-    res = requests.get(url, headers=headers)
-
+    res = requests.get(url, params=params, headers=headers)
     date = datetime.datetime.now(tz=datetime.timezone(datetime.timedelta(hours=9)))
 
     fg = FeedGenerator()
 
     fg.title('tfreeca RSS')
     fg.author({'name': 'David Choi', 'email': 'themars@gmail.com'})
-    fg.link(href='https://www.tfreeca22.com/board.php?mode=list&b_id=' + board_id, rel='alternate')
+    fg.link(href=res.url, rel='alternate')
     fg.subtitle('tfreeca feed rss')
     fg.language('ko')
     fg.lastBuildDate(date)
 
     if res.status_code == 200:
-        regex = r"href=\"board\.php\?mode=view&b_id=" + board_id + "&id=(.*?)&sc=.*?&page=1\" class=\"stitle1\">(.*?)<span .*?</a>"
+        regex = r"href=\"board\.php\?mode=view&b_id=" + board_id + "&id=(.*?)&sc=.*?&page=1\" class=\"stitle[0-9]\">(.*?)<span .*?</a>"
         matches = re.finditer(regex, res.text, re.DOTALL)
         for matchNum, match in enumerate(matches, start=1):
             item_id = match.group(1)
