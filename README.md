@@ -1,7 +1,14 @@
 # tfreeca rss list and downloader
 
-chromedriver 폴더의 크롬 드라이버를 본인의 버전에 맞는 버전으로 교체 필요.
-첨부된 버전은 99.x
+
+### Execute
+
+```
+$ git clone https://github.com/mars2cbh/tfreeca_rss.git
+$ cd tfreeca_rss
+$ docker-compose up -d
+
+```
 
 ### List
 http://127.0.0.1:8881/rss?b_id=tdrama&sc=720p-NEXT
