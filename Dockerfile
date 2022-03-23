@@ -9,4 +9,6 @@ COPY . .
 
 EXPOSE 8881
 
+ENV os linux
+
 CMD [ "python", "./app.py" ]
