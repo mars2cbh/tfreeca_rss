@@ -27,14 +27,15 @@ logger.addHandler(streamHandler)
 
 # Chrome Driver Option Setting
 options = Options()
-options.add_argument("--window-size=600,600")
+options.add_argument("--window-size=100,100")
 options.add_argument("--disable-popup-blocking")
 options.add_argument("--disable-blink-features")
 options.add_argument("--disable-blink-features=AutomationControlled")
+options.add_argument('--blink-settings=imagesEnabled=false')
 
 if os_info == "linux":
     options.add_argument('--headless')
-    options.add_argument("--disable-gpu")
+    # options.add_argument("--disable-gpu")
 elif os_info == "windows":
     # options.add_argument('--headless')
     # options.add_argument("--disable-gpu")
