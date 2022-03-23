@@ -5,6 +5,7 @@ import requests
 from feedgen.feed import FeedGenerator
 from flask import Flask, request, Response, send_file
 
+import config
 from download import Download
 
 app = Flask(__name__)
@@ -44,7 +45,7 @@ def rss():
     params = {"mode": "list", "b_id": board_id, "sc": sc}
     url = "https://www.tfreeca22.com/board.php"
 
-    res = requests.get(url, params=params, headers=headers)
+    res = requests.get(url, params=params, headers=config.headers)
     date = datetime.datetime.now(tz=datetime.timezone(datetime.timedelta(hours=9)))
 
     fg = FeedGenerator()
