@@ -1,0 +1,17 @@
+version: '3.7'
+
+services:
+  tfreeca_rss_server:
+    container_name: tfreeca_rss_server
+    image: tfreeca_rss_server:latest
+    build:
+      context: .
+    environment:
+      - TZ=Asia/Seoul
+      - os=linux
+    ports:
+      - "8881:8881"
+    sysctls:
+      - net.core.somaxconn=65000
+    restart: on-failure
+

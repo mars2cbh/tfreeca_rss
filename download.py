@@ -13,14 +13,18 @@ from ext import chrome_cmd
 
 class Download:
 
-    __slots__ = ["b_id", "id", "driver", "logger"]
+    __slots__ = ["b_id", "id", "driver", "logger", "driver_error"]
 
     def __init__(self, b_id, id):
         self.b_id = b_id
         self.id = id
         self.logger = config.logger
-        self.driver = webdriver.Chrome("{}/chromedriver/chromedriver_{}".format(os.getcwd(), config.os_info),
+        try:
+            self.driver = webdriver.Chrome("{}/chromedriver/chromedriver_{}".format(os.getcwd(), config.os_info),
                                        chrome_options=config.options)
+            self.driver_error = False
+        except Exception as _:
+            self.driver_error = True
 
     def __del__(self):
         # for handle in self.driver.window_handles:
@@ -30,6 +34,10 @@ class Download:
         self.driver.quit()
 
     def start(self):
+
+        if self.driver_error:
+            return "chrome driver를 로드할 수 없습니다."
+
         try:
             view_url = "https://www.tfreeca22.com/board.php?mode=view&b_id={}&id={}".format(self.b_id, self.id)
             self.logger.debug("VIEW_URL : {}".format(view_url))
